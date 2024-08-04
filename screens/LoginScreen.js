@@ -3,6 +3,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import { FIREBASE_AUTH } from '../app/context/FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { SvgUri } from 'react-native-svg';
+import * as SecureStore from 'expo-secure-store';
 
 const LoginScreen = ({navigation}) => {
 
@@ -18,6 +19,11 @@ const LoginScreen = ({navigation}) => {
       try{
         const response = await signInWithEmailAndPassword(auth, email, password);
         console.log(response);
+        // Making sure the user is already authenticated 
+        const user = response.user;
+        const token = await user.getIdToken();
+        await SecureStore.setItemAsync('userToken', token);
+
         alert('Check your emails!');
       } catch (error){
           console.log(error);

@@ -4,7 +4,8 @@ import { FIREBASE_AUTH, FIREBASE_DB } from '../app/context/FirebaseConfig';
 import { SvgUri } from 'react-native-svg';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { addDoc } from 'firebase/firestore';
-import { collection } from 'firebase/firestore';
+import { ref, set } from 'firebase/database';
+
 
 const RegisterScreen = ({navigation}) => {
 
@@ -14,17 +15,19 @@ const RegisterScreen = ({navigation}) => {
     const auth = FIREBASE_AUTH;
     const db = FIREBASE_DB;
 
-    const storeData = async(email, password) => {
-    try{
-      const docRef = await addDoc(collection(db, 'users'), {
-        email: email,
-        password: password,
-      });
-      console.log('User data stored in Firestore with ID: ', docRef.id);
-    } catch (error) {
-      console.error('Error storing user data in Firestore: ', error);
-    }
-    }
+    const storeData = async (email, password) => {
+      try {
+        const db = FIREBASE_DB;
+        const userRef = ref(db, 'users/' + email.replace('.', '_'));
+        await set(userRef, {
+          email: email,
+          password: password,
+        });
+        console.log('User data stored in Realtime Database');
+      } catch (error) {
+        console.error('Error storing user data in Realtime Database: ', error);
+      }
+    };
     
 
     const signUp = async () => {
